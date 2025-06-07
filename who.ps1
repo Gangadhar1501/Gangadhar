@@ -1,35 +1,54 @@
-function Get-LoggedInUserActivity {
-    Write-Host "`n=== Logged-In Users (like 'who') ===`n"
-    query user
-    Write-Host "`n=== Session Info (like 'users') ===`n"
-    Get-CimInstance -Class Win32_LoggedOnUser |
-    ForEach-Object {
-        $user = $_.Antecedent -replace '^.*Domain="([^"]+)",Name="([^"]+)".*$', '$1\$2'
-        Write-Output $user
-    } | Sort-Object -Unique
-    Write-Host "`n=== Active User Processes (like 'w') ===`n"
-    Get-Process | ForEach-Object {
-        try {
-            $proc = Get-WmiObject Win32_Process -Filter "ProcessId = $($_.Id)"
-            $owner = $proc.GetOwner()
-            [PSCustomObject]@{
-                User        = "$($owner.Domain)\$($owner.User)"
-                Process     = $_.ProcessName
-                StartTime   = $_.StartTime
-                PID         = $_.Id
-            }
-        } catch {}
-    } | Where-Object { $_.User -ne $null } | Sort-Object User | Format-Table -AutoSize
+
+abstract class Employee {
+   private String name;
+   private String address;
+   private int number;
+
+   public Employee(String name, String address, int number) {
+      System.out.println("Constructing an Employee");
+      this.name = name;
+      this.address = address;
+      this.number = number;
+   }
+   
+   public double computePay() {
+     System.out.println("Inside Employee computePay");
+     return 0.0;
+   }
+   
+   public void mailCheck() {
+      System.out.println("Mailing a check to " + this.name + " " + this.address);
+   }
+
+   public String toString() {
+      return name + " " + address + " " + number;
+   }
+
+   public String getName() {
+      return name;
+   }
+ 
+   public String getAddress() {
+      return address;
+   }
+   
+   public void setAddress(String newAddress) {
+      address = newAddress;
+   }
+ 
+   public int getNumber() {
+      return number;
+   }
 }
-
-
-
-
-
-
-
-
-
-
+//Main.java
+public class Main
+{
+public static void main(String [] args) {
+      /* Following is not allowed and would raise error */
+      Employee e = new Employee("George W.", "Houston, TX", 43);
+      System.out.println("\n Call mailCheck using Employee reference--");
+      e.mailCheck();
+   }
+}
 
 
